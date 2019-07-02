@@ -68,8 +68,16 @@ resource "aws_lb_listener" "frontend_http_tcp" {
   count             = "${var.create_alb && var.logging_enabled ? var.http_tcp_listeners_count : 0}"
 
   default_action {
-    target_group_arn = "${aws_lb_target_group.main.*.id[lookup(var.http_tcp_listeners[count.index], "target_group_index", 0)]}"
-    type             = "forward"
+    type = "redirect"
+
+    redirect {
+      protocol    = "HTTPS"
+      port        = "443"
+      host        = "#{host}"
+      path        = "/#{path}"
+      query       = "#{query}"
+      status_code = "${var.redirect_status_code}"
+    }
   }
 }
 
@@ -82,8 +90,12 @@ resource "aws_lb_listener" "frontend_https" {
   count             = "${var.create_alb && var.logging_enabled ? var.https_listeners_count : 0}"
 
   default_action {
-    target_group_arn = "${aws_lb_target_group.main.*.id[lookup(var.https_listeners[count.index], "target_group_index", 0)]}"
-    type             = "forward"
+    type = "fixed-response"
+
+    fixed_response {
+      content_type = "text/plain"
+      status_code  = "403"
+    }
   }
 }
 

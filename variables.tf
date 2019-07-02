@@ -139,3 +139,8 @@ variable "target_groups_defaults" {
 variable "vpc_id" {
   description = "VPC id where the load balancer and other resources will be deployed."
 }
+
+variable "redirect_status_code" {
+  description = "Lets set a 302 as a safe default."
+  default     = "HTTP_302"
+}
